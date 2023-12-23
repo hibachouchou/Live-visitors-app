@@ -33,7 +33,7 @@ export const LiveVisitors = () => {
       });
     });
 
-  }, [socket, axios]);
+  }, []);
 
 
   return (
