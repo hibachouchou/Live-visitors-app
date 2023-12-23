@@ -1,14 +1,43 @@
-// Copyright 2023 hibac
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+const express = require("express");
+const { createServer } = require("http");
+const io = require("socket.io");
 
+const app = express();
+const httpServer = createServer(app);
+
+const socketServer = io(httpServer, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
+});
+
+const allVisitors = [];
+
+const emitVisitors = () => {
+  socketServer.emit("visitors", allVisitors);
+};
+
+socketServer.on("connection", (socket) => {
+  console.log("user connected");
+
+  socket.on("new_visitor", (user) => {
+    // Check if the user already exists before adding
+    const existingUser = allVisitors.find((v) => v.ip === user.ip);
+    if (!existingUser) {
+      socket.user = user;
+      console.log("new visitor ", user);
+      allVisitors.push(user);
+      emitVisitors();
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
+});
+
+const port = 6001;
+httpServer.listen(port, function () {
+  console.log(`listening on *:${port}`);
+});

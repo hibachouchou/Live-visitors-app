@@ -1,12 +1,18 @@
-import Header from "./Header"
+//import Header from "./components/Header"
+import { BrowserRouter, Route,Routes } from "react-router-dom";
+import { LiveVisitors } from "./components/LiveVisitors";
+
 
 
 function App() {
   return (
     <>
-      <>
-      <Header/>
-      </>
+      <BrowserRouter>
+       <Routes>
+       {/* <Route path="/" element={<Header/>} />  */}
+        <Route path="/" element={<LiveVisitors/>} /> 
+      </Routes>
+      </BrowserRouter>
     </>
   )
 }
